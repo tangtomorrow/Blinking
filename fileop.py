@@ -9,6 +9,7 @@ import os
 
 
 # 该函数传入三个参数，第一个用不到，第二个是当前处理的目录，第三个是当前目录下的文件列表
+# 删除当前目录下的无数据文件
 def deleteEmptyFile(arg, dirname, files):
     for file in files:
         # 获取文件的绝对路径
@@ -29,6 +30,7 @@ def deleteEmptyFile(arg, dirname, files):
 
 
 # 该函数传入三个参数，第一个是需要从首部删除的行数，第二个是当前处理的目录，第三个是当前目录下的文件列表
+# 删除当前目录下所有文件的前N行
 def deleteTopNLines(numbers, dirname, files):
     for file in files:
         # 获取文件的绝对路径
@@ -44,3 +46,31 @@ def deleteTopNLines(numbers, dirname, files):
             with open(abspath, 'w') as f:
                 for line in lines:
                     f.write(line.strip() + '\n')
+
+
+# 该函数传入三个参数，第一个用不到，第二个是当前处理的目录，第三个是当前目录下的文件列表
+def convertTxtToCsv(args, dirname, files):
+    for file in files:
+        abspath = os.path.join(dirname, file)
+
+        if os.path.isfile(abspath):
+            with open(abspath, 'r') as f:
+                lines = f.readlines()
+
+            newlines = []
+            for line in lines:
+                newlines.append(convertLine(line))
+
+            # write new line
+            str = os.path.splitext(abspath)
+            newAbsPath = str[0] + ".xx"
+            with open(newAbsPath, 'a') as f:
+                for line in newlines:
+                    f.write(line.strip() + '\n')
+
+def convertLine(line):
+    newLine = line.replace(',', '')
+    # 先找出日期结束的位置
+    index = line.find(':00:00') + 6
+    print index
+    return newLine

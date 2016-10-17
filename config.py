@@ -5,4 +5,4 @@
 # 变量配置-文件目录等   #
 #########################
 
-rootdir = r'/Users/tangtomorrow/Work/IntelliJ/Blinking/data'
+rootdir = r'D:/[tym]/intellij/Blinking/temp/tmp'
