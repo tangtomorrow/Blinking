@@ -68,9 +68,12 @@ def convertTxtToCsv(args, dirname, files):
                 for line in newlines:
                     f.write(line.strip() + '\n')
 
+
 def convertLine(line):
-    newLine = line.replace(',', '')
-    # 先找出日期结束的位置
-    index = line.find(':00:00') + 6
-    print index
-    return newLine
+    # 处理三位以上数据自带分隔符的问题
+    line = line.replace(',', '')
+
+    # 处理时间字段与后面的内容没有分隔的问题
+    line = line.replace(':00:00', ':00:00,')
+
+    return line
