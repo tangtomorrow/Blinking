@@ -6,8 +6,10 @@
 #########################
 
 import os
+
 import config
 import fileop
+
 
 def main():
     # step1	遍历数据目录，删除不包含有效数据的文件

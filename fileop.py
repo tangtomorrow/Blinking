@@ -6,6 +6,9 @@
 #########################
 
 import os
+import re
+
+import config
 
 
 # 该函数传入三个参数，第一个用不到，第二个是当前处理的目录，第三个是当前目录下的文件列表
@@ -57,23 +60,40 @@ def convertTxtToCsv(args, dirname, files):
             with open(abspath, 'r') as f:
                 lines = f.readlines()
 
-            newlines = []
+            newlines = [config.csvtitle]
             for line in lines:
                 newlines.append(convertLine(line))
 
             # write new line
             str = os.path.splitext(abspath)
-            newAbsPath = str[0] + ".xx"
+            newAbsPath = str[0] + ".csv"
             with open(newAbsPath, 'a') as f:
                 for line in newlines:
                     f.write(line.strip() + '\n')
 
 
 def convertLine(line):
+    newLine = ''
+
     # 处理三位以上数据自带分隔符的问题
     line = line.replace(',', '')
 
-    # 处理时间字段与后面的内容没有分隔的问题
-    line = line.replace(':00:00', ':00:00,')
+    p = re.compile(r'\s+')
+    strs = p.split(line)
 
-    return line
+    temperatureIndex = strs[1].index(':00:00') + 6
+    time = strs[0] + '' + strs[1][0:temperatureIndex]
+    temperature = strs[1][temperatureIndex:len(strs[1])]
+    strs[0] = time
+    strs[1] = temperature
+
+    for s in strs:
+        if s == "-":
+            newLine += ','
+        else:
+            newLine += s
+            newLine += ','
+    # 处理时间字段与后面的内容没有分隔的问题
+    # line = line.replace(':00:00', ':00:00,')
+
+    return newLine
