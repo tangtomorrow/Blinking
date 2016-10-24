@@ -5,10 +5,31 @@
 # 定义了对文件的操作    #
 #########################
 
+import codecs
 import os
 import re
+import sys
 
 import config
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
+# 该函数传入三个参数，第一个为坐标结果，第二个是当前处理的目录，第三个是当前目录下的文件列表
+# 删除当前目录下的无数据文件
+def deleteNoLatitudFile(places, dirname, files):
+    for file in files:
+        # 获取文件的绝对路径
+        abspath = os.path.join(dirname, file)
+
+        if os.path.isfile(abspath):
+            (filename, extension) = os.path.splitext(file)
+            filename = filename[0:-1]
+
+            # 如果文件名（地点名）没有对应的坐标，则删除该文件
+            if not places.get(filename):
+                os.remove(abspath)
 
 
 # 该函数传入三个参数，第一个用不到，第二个是当前处理的目录，第三个是当前目录下的文件列表
@@ -66,12 +87,13 @@ def convertTxtToCsv(args, dirname, files):
 
             # write new line
             str = os.path.splitext(abspath)
-            newAbsPath = str[0] + ".csv"
+            newAbsPath = str[0].replace(config.rootdir, config.rootdirCsv) + ".csv"
             with open(newAbsPath, 'a') as f:
                 for line in newlines:
                     f.write(line.strip() + '\n')
 
 
+# 该函数传入一个参数，将txt中的某一行转换成csv中的某一行
 def convertLine(line):
     newLine = ''
 
@@ -93,7 +115,18 @@ def convertLine(line):
         else:
             newLine += s
             newLine += ','
-    # 处理时间字段与后面的内容没有分隔的问题
-    # line = line.replace(':00:00', ':00:00,')
 
     return newLine
+
+
+# 根据locations.txt，读取地点名和对应的两个坐标，并存入字典，字典中key对应地点名，value对应坐标
+def readPlaces(placesPath, fileEncoding='utf-8'):
+    places = dict()
+    with codecs.open(placesPath, 'r', fileEncoding) as f:
+        lines = f.readlines()
+        for line in lines:
+            strs = line.split(" ", 1)
+            # print strs[0], "------", strs[1]
+            # print type(strs[0])
+            places[strs[0]] = strs[1]
+    return places
